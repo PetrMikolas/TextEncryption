@@ -1,0 +1,57 @@
+﻿@using TextEncryption.Enums
+@model TextEncryption.Models.MorseCodeModel
+
+@{
+	ViewData["Title"] = "Šifrování textu";
+}
+
+<div id="cover">
+	<form asp-action="Index" id="form">
+		<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+		<h4 class="mt-3 mb-4">Šifrovací algoritmus - Morseova abeceda</h4>
+
+		<fieldset>
+			<input asp-for="@Model.EncryptionActivity" id="Encrypt" value="@EncryptionActivity.Encrypt" type="radio" onclick="submit()" checked>
+			<label for="@EncryptionActivity.Encrypt" style="margin-right: 80px">Šifrovat</label>
+
+			<input asp-for="@Model.EncryptionActivity" id="Decrypt" value="@EncryptionActivity.Decrypt" type="radio" onclick="submit()">
+			<label for="@EncryptionActivity.Decrypt">Dešifrovat </label>
+		</fieldset>
+
+		<br />
+
+		<div>
+			<label>@Html.Raw(Model.Label.InputText)</label>
+			<br />
+			<textarea asp-for="@Model.InputText" id="inputText" OnKeypress="return validateText()" placeholder="Vložte text dle nápovědy v popisku"></textarea>
+		</div>
+
+		<br />
+
+		<div>
+			<label>@Model.Label.OutputText</label>
+			<br />
+			<textarea id="outputText" readonly>@Model.OutputText</textarea>
+		</div>
+
+		<br />
+
+		<div class="mb-2">
+			<input asp-for="@Model.Submit" class="btn btn-success" value="Šifruj / Dešifruj" type="submit" />
+			<button class="btn btn-danger float-end " onclick="resetAllControls()">Vymazat text</button>
+		</div>
+
+	</form>
+</div>
+
+
+@section Scripts {
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
+}
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="~/js/jQuery.js"></script>
+<script src="~/js/MorseCode.js"></script>
