@@ -1,5 +1,7 @@
 # Šifrování textu
-Webová aplikace na šifrování a dešifrovaní textu. Naprogramováno v jazyce C# v prostředí Microsoft ASP.NET Core MVC
+Webová aplikace na šifrování a dešifrovaní textu. 
+
+Naprogramováno v jazyce C# v prostředí Microsoft ASP.NET Core MVC .NET 7
 
 ![Screenshot](TextEncryption_1.png)
 ![Screenshot](TextEncryption_2.png)
