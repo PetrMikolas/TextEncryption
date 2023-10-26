@@ -133,6 +133,7 @@ internal class CaesarCipherService : ICaesarCipherService
 		catch (Exception ex)
 		{
 			text = ex.Message;
+   			return new Validation(false, text);
 		}
 
 		return new Validation(true, text);
