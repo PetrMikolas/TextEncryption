@@ -5,7 +5,20 @@ VisualStudioVersion = 17.7.34024.191
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TextEncryption", "TextEncryption\TextEncryption.csproj", "{8B879AF8-A0E7-4FF3-B49A-710587826AC7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TextEncryption.UnitTests", "TextEncryption.UnitTests\TextEncryption.UnitTests.csproj", "{3153E721-E86E-4C86-B096-EE0FDFFE337C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TextEncryption.UnitTests", "TextEncryption.UnitTests\TextEncryption.UnitTests.csproj", "{3153E721-E86E-4C86-B096-EE0FDFFE337C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{69DC8089-2068-4F44-9387-0E718F4372D6}"
+	ProjectSection(SolutionItems) = preProject
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docker", "Docker", "{22D58BCC-6812-4ED3-A83E-C79319FD13F1}"
+	ProjectSection(SolutionItems) = preProject
+		.dockerignore = .dockerignore
+		DockerDesktopScript.ps1 = DockerDesktopScript.ps1
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
