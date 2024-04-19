@@ -17,6 +17,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docker", "Docker", "{22D58BCC-6812-4ED3-A83E-C79319FD13F1}"
 	ProjectSection(SolutionItems) = preProject
 		.dockerignore = .dockerignore
+		docker-compose.yaml = docker-compose.yaml
 		DockerDesktopScript.ps1 = DockerDesktopScript.ps1
 	EndProjectSection
 EndProject

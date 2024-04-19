@@ -1,0 +1,13 @@
+version: "3" 
+
+services:  
+  textencryption:    
+    container_name: textencryption
+    image: textencryption:latest  
+    environment:
+     - ASPNETCORE_ENVIRONMENT=Production
+    restart: unless-stopped
+    ports:
+      - 7500:8080
+      - 7501:8081  
+    network_mode: bridge   
