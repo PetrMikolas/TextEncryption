@@ -8,154 +8,152 @@ namespace TextEncryption.Services.MorseCode;
 /// <summary>
 /// Service for encrypting text into morse code and decrypting text from morse code
 /// </summary>
-internal class MorseCodeService : IMorseCodeService
+internal sealed class MorseCodeService : IMorseCodeService
 {
-    private readonly char[] _textChars = { ' ', ',', '.', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+    /// <summary>
+    /// Dictionary mapping characters to their Morse code representation
+    /// </summary>
+    private readonly Dictionary<char, string> _characterToMorseCode = new()
+    {
+        {' ', " "}, {',', "--..--"}, {'.', ".-.-.-"}, {'a', ".-"}, {'b', "-..."}, {'c', "-.-."},
+        {'d', "-.."}, {'e', "."}, {'f', "..-."}, {'g', "--."}, {'h', "...."}, {'i', ".."}, {'j', ".---"},
+        {'k', "-.-"}, {'l', ".-.."}, {'m', "--"}, {'n', "-."}, {'o', "---"}, {'p', ".--."}, {'q', "--.-"},
+        {'r', ".-."}, {'s', "..."}, {'t', "-"}, {'u', "..-"}, {'v', "...-"}, {'w', ".--"}, {'x', "-..-"},
+        {'y', "-.--"}, {'z', "--.."}, {'0', "-----"}, {'1', ".----"}, {'2', "..---"}, {'3', "...--"},
+        {'4', "....-"}, {'5', "....."}, {'6', "-...."}, {'7', "--..."}, {'8', "---.."}, {'9', "----."}
+    };
 
-    private readonly string[] _morseCodeChars = { " ", "--..--", ".-.-.-", ".-", "-...", "-.-.", "-..", ".", "..-.", "--.", "....", "..", ".---", "-.-", ".-..", "--", "-.", "---", ".--.", "--.-", ".-.", "...", "-", "..-", "...-", ".--", "-..-", "-.--", "--..", "-----", ".----", "..---", "...--", "....-", ".....", "-....", "--...", "---..", "----." };
-        
-	/// <summary>
-	/// Encrypts plaintext
-	/// </summary>
-	/// <param name="plainText">Plain text</param>
-	/// <returns>Ciphertext</returns>
-	public string Encrypt(string? plainText)
+    /// <summary>
+    /// Encrypts plaintext into Morse code
+    /// </summary>
+    /// <param name="plainText">Plain text</param>
+    /// <returns>Ciphertext in Morse code</returns>
+    public string Encrypt(string? plainText)
     {
         string cipherText = string.Empty;
         var validation = ValidationPlainText(plainText);
-        plainText = validation.Text;
 
         if (!validation.IsValid)
         {
-            return validation.Text;
+            return validation.Text;  // Return error message if plainText is invalid
         }
 
         try
         {
-            for (int i = 0; i < plainText.Length; i++)
+            // Convert each character of the plaintext to Morse code
+            validation.Text.ToList().ForEach(character =>
             {
-                for (int j = 0; j < _textChars.Length; j++)
+                if (_characterToMorseCode.TryGetValue(character, out string? morseCode))
                 {
-                    if (plainText[i] == _textChars[j])
-                    {
-                        cipherText += _morseCodeChars[j];
-                        cipherText += "|";                    // space between each character of the morse code                              
-					}
+                    cipherText += morseCode + "|"; // Add Morse code representation of the character to the ciphertext, with pipe character between each Morse code sequence                                                            
                 }
-            }
+            });
+
+            return cipherText;
         }
         catch (Exception ex)
         {
-            cipherText = ex.Message;
+            return ex.Message;
         }
-
-        return cipherText;
     }
 
-	/// <summary>
-	/// Validates that the plain text is not empty and contains only allowed characters
-	/// </summary>
-	/// <param name="plainText">Plain text</param>
-	/// <returns>If successful, returns true and plain text. Otherwise, it returns false and an error message</returns>
-	private Validation ValidationPlainText(string? plainText)
+    /// <summary>
+    /// Validates that the plain text is not empty and contains only allowed characters
+    /// </summary>
+    /// <param name="plainText">Plain text</param>
+    /// <returns>If successful, returns true and plain text. Otherwise, it returns false and an error message</returns>
+    private Validation ValidationPlainText(string? plainText)
     {
-        bool isValid = false;
-
         if (string.IsNullOrWhiteSpace(plainText))
         {
-            plainText = Helper.GetErrorMessage(Error.EmptyInputText);
-			return new Validation(isValid, plainText);
+            var errorMessage = Helper.GetErrorMessage(Error.EmptyInputText);
+            return new Validation(false, errorMessage);  // Return error message if plainText is null or empty
         }
 
         try
         {
             plainText = plainText.Trim().ToLower();
-            isValid = plainText.All(znak => _textChars.Any(x => x.Equals(znak)));
+            var isValid = plainText.All(_characterToMorseCode.ContainsKey); // Check if all characters in the plain text are valid 
 
             if (!isValid)
             {
-                plainText = Helper.GetErrorMessage(Error.InvalidInputText); 
+                plainText = Helper.GetErrorMessage(Error.InvalidInputText); // Return error message if plain text contains invalid characters
             }
+
+            return new Validation(isValid, plainText);
         }
         catch (Exception ex)
         {
-            plainText = ex.Message;
+            return new Validation(false, ex.Message); // Handle any exceptions and return error message
         }
-
-        return new Validation(isValid, plainText);
     }
 
-	/// <summary>
-	/// Decrypts ciphertext
-	/// </summary>
-	/// <param name="ciphertext">Ciphertext</param>
-	/// <returns>Plain text</returns>     
-	public string Decrypt(string? ciphertext)
+    /// <summary>
+    /// Decrypts Morse code ciphertext into plain text
+    /// </summary>
+    /// <param name="ciphertext">Ciphertext in Morse code</param>
+    /// <returns>Decrypted plain text</returns> 
+    public string Decrypt(string? ciphertext)
     {
         string plainText = string.Empty;
         var validation = ValidationCipherText(ciphertext);
-        ciphertext = validation.Text;
-        string[] inputMorseCodeChars;
 
         if (!validation.IsValid)
         {
-            return validation.Text;
+            return validation.Text;  // Return error message if ciphertext is invalid
         }
 
         try
         {
-            inputMorseCodeChars = ciphertext.Split('|');
+            var inputMorseCodeChars = validation.Text.Split('|', StringSplitOptions.RemoveEmptyEntries).ToList();
 
-            for (int i = 0; i < inputMorseCodeChars.Length; i++)
+            // Convert each Morse code character to its corresponding plain text character
+            inputMorseCodeChars.ForEach(morseChar =>
             {
-                for (int j = 0; j < _morseCodeChars.Length; j++)
+                var matchingChar = _characterToMorseCode.FirstOrDefault(x => x.Value == morseChar).Key;
+
+                if (matchingChar != default) // Check if matching char found
                 {
-                    if (inputMorseCodeChars[i] == _morseCodeChars[j])
-                    {
-                        plainText += _textChars[j];
-                    }
+                    plainText += matchingChar;
                 }
-            }
+            });
+
+            return plainText;
         }
         catch (Exception ex)
         {
-            plainText = ex.Message;
+            return ex.Message; // Handle any exceptions and return error message
         }
-
-        return plainText;
     }
 
-	/// <summary>
-	/// Validates that the ciphertext is not empty and contains only allowed characters
-	/// </summary>
-	/// <param name="ciphertext">Ciphertext</param>
-	/// <returns>If successful, returns true and plain text. Otherwise, returns false and an error message</returns>
-	private Validation ValidationCipherText(string? ciphertext)
+    /// <summary>
+    /// Validates that the ciphertext is not empty and contains only allowed characters
+    /// </summary>
+    /// <param name="ciphertext">Ciphertext in Morse code</param>
+    /// <returns>If successful, returns true and plain text. Otherwise, returns false and an error message</returns>
+    private Validation ValidationCipherText(string? ciphertext)
     {
-        bool isValid = false;
-
         if (string.IsNullOrWhiteSpace(ciphertext))
         {
-            ciphertext = Helper.GetErrorMessage(Error.EmptyInputText);
-			return new Validation(isValid, ciphertext);
+            var errorMessage = Helper.GetErrorMessage(Error.EmptyInputText);
+            return new Validation(false, errorMessage);  // Return an error message if the ciphertext is null or empty
         }
 
         try
         {
-            ciphertext = ciphertext.Trim();
-            var inputMorseCodeChars = ciphertext.Split('|', StringSplitOptions.RemoveEmptyEntries).ToList();
-            isValid = inputMorseCodeChars.All(character => _morseCodeChars.Any(x => x.Equals(character)));
+            var inputMorseCodeChars = ciphertext.Trim().Split('|', StringSplitOptions.RemoveEmptyEntries);
+            var isValid = inputMorseCodeChars.All(_characterToMorseCode.ContainsValue);  // Check if all Morse code characters are valid
 
             if (!isValid)
             {
-                ciphertext = Helper.GetErrorMessage(Error.InvalidInputText);
+                ciphertext = Helper.GetErrorMessage(Error.InvalidInputText);  // Return an error message if the ciphertext contains invalid Morse code characters
             }
+
+            return new Validation(isValid, ciphertext);
         }
         catch (Exception ex)
         {
-            ciphertext = ex.Message;
+            return new Validation(false, ex.Message);  // Handle any exceptions and return an error message
         }
-
-        return new Validation(isValid, ciphertext);
-    }    	
+    }
 }
